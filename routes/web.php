@@ -25,6 +25,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/users/{id}/update-checklist-limit', [UserController::class, 'updateChecklistsLimit'])->name('users.update-checklist-limit');
 });
 Route::resource('checklist', ChecklistController::class);
-Route::resource('action', ActionController::class);
 
 require __DIR__.'/auth.php';

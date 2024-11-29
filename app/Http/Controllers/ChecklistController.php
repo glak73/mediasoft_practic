@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Checklist;
+
+use App\Models\Action;
 use Illuminate\Http\Request;
 
 class ChecklistController extends Controller
@@ -12,7 +14,8 @@ class ChecklistController extends Controller
      */
     public function index()
     {
-        //
+        $checklists = Checklist::all();
+        return view('checklist.index', ['checklists' => $checklists]);
     }
 
     /**
@@ -59,6 +62,9 @@ class ChecklistController extends Controller
      */
     public function edit(Checklist $checklist)
     {
+        if ($checklist->user_id !== auth()->id()) {
+            abort(403, 'Вы не имеете права редактировать этот чеклист.');
+        }
         return view('checklist.edit', ['checklist' => $checklist]);
     }
 
@@ -67,7 +73,30 @@ class ChecklistController extends Controller
      */
     public function update(Request $request, Checklist $checklist)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100',
+            'checklist' => 'required|numeric',
+        ]);
+
+        // Изменим обработку поля is_completed
+        if ($request->has('is_completed')) {
+            $is_completed = true;
+        } else {
+            $is_completed = false;
+        }
+        // $is_completed = $request->input('is_completed') ?? false;
+
+        $action = Action::create([
+            'name' => $validatedData['name'],
+            'checklist_id' => $validatedData['checklist'],
+            'is_completed' => $is_completed
+        ]);
+
+        if (!$action) {
+            return back()->withInput()->withErrors(['title' => 'Ошибка при создании действия']);
+        }
+
+        return redirect()->route('checklist.edit', $checklist->id);
     }
 
     /**

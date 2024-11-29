@@ -24,9 +24,10 @@
                 @endif
 
                 <!-- Форма для добавления нового пункта -->
-                <form id="add-action-form" method="POST" action="{{ route('action.store') }}">
+                <form id="add-action-form" method="POST" action="{{ route('checklist.update', ['checklist' => $checklist->id]) }}">
                     @csrf
-                    <input type="hidden" name="checklist_id" value="{{ $checklist->id }}">
+                    @method('PATCH')
+                    <input type="hidden" name="checklist" value="{{ $checklist->id }}">
                     <div class="mb-3">
                         <label for="action-name" class="form-label">Название действия</label>
                         <input type="text" class="form-control" id="name" name="name" required>
